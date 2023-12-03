@@ -1,6 +1,6 @@
-# SharpWebServer :eyes:
+# SharpWebServer 🛰️
 
-## Servidor http feito em C#
+## Servidor http feito em C# 👀
 
 Utiliza os conceitos abaixo (entre outros): 
 
@@ -13,5 +13,6 @@ Utiliza os conceitos abaixo (entre outros):
 - Interpretação e Gerenciamento de requisição HTTP (htttp header solicitação) :bulb:
 - Interpretação e Gerenciamento de retorno HTTP (htttp header de retorno texto e imagem) :bulb:
 - Interpretação e Gerenciamento de cabeçalho HTTP :bulb:
+- Medidor de performance (StopWatch) 💡
 
 :cop: *ATENÇÃO - Nenhum bug de segurança foi encontrado, porem não é recomendado usar em produção / servidores oficiais.* :cop:
