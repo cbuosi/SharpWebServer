@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 public class SocketListener
 {
-    const string VERSAO = "2.03";
+    const string VERSAO = "2.04";
 
     enum eTipoReqHTTP
     {
@@ -119,7 +119,6 @@ public class SocketListener
     static string DESCRICAO_SERVIDOR = ""; //Config.xml
     static string ARQUIVO_PADRAO = ""; //Config.xml
     static string CACHE_MAX_AGE = ""; //Config.xml
-
 
     static Stopwatch? oReloginho = null;
 
@@ -245,8 +244,6 @@ public class SocketListener
         byte[] msg_resp = { };
         byte[] msg_resp_texto = { };
         byte[] msg_resp_binario = { };
-
-
         byte[] bytes = { };
         int bytesRec = 0;
 
@@ -256,7 +253,7 @@ public class SocketListener
             DesenhaLogo();
 
             ROOT_SERVIDOR = ObterConfig("ROOT_SERVIDOR");
-            DESCRICAO_SERVIDOR = ObterConfig("DESCRICAO_SERVIDOR") + " (" + VERSAO + ")"; //"IBM_CICS_Transaction_Server / 3.1.0(zOS)";
+            DESCRICAO_SERVIDOR = ObterConfig("DESCRICAO_SERVIDOR") + " (" + VERSAO + ")";
             ARQUIVO_PADRAO = ObterConfig("ARQUIVO_PADRAO");
             CACHE_MAX_AGE = ObterConfig("CACHE_MAX_AGE");
 
@@ -265,11 +262,6 @@ public class SocketListener
             Console.WriteLine($"Caminho raiz servidor......: [{ROOT_SERVIDOR}]");
             Console.WriteLine($"Arquivo raiz padrão........: [{ARQUIVO_PADRAO}]");
             Console.WriteLine($"Tempo Cache (seg.).........: [{CACHE_MAX_AGE}]");
-
-
-            // Get Host IP Address that is used to establish a connection
-            // In this case, we get one IP address of localhost that is IP : 127.0.0.1
-            // If a host has multiple addresses, you will get a list of addresses
 
             Console.Write("Obtendo endereço(s) rede...:");
             IPHostEntry host = Dns.GetHostEntry("localhost");
@@ -292,8 +284,6 @@ public class SocketListener
             Console.WriteLine($"Utilizando Porta...........: [{PortaServico}] ");
             localEndPoint = new IPEndPoint(IPAddress.Any, PortaServico);
 
-
-
             // Create a Socket that will use Tcp protocol
             Console.Write($"Criando 'Listener'.........: ");
             Socket listener = new Socket(IPAddress.Any.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -304,11 +294,12 @@ public class SocketListener
             listener.Bind(localEndPoint);
             Console.WriteLine($"[OK]");
 
-            // Specify how many requests a Socket can listen before it gives Server busy response.
-            // We will listen 10 requests at a time
+            // Specify how many requests a Socket can listen before it gives Server busy response. We will listen 10 requests at a time
             Console.Write($"Listener Ativado...........: ");
             listener.Listen(MaxConSimultaneas);
             Console.WriteLine($"[OK] - {MaxConSimultaneas.ToString()} conexoes simultaneas.");
+
+            Console.WriteLine($"Navegue para...............: [http://{ipAddress.ToString()}/{ARQUIVO_PADRAO}]");
 
 
             while (true)
@@ -318,9 +309,7 @@ public class SocketListener
                 Socket handler = listener.Accept();
                 oReloginho = new Stopwatch();
                 oReloginho.Start();
-                // Incoming data from the client.
-                //while (true)
-                //{
+                
                 dado_recebido = string.Empty;
                 dado_retorno = string.Empty;
                 bytes = new byte[1024];
@@ -334,7 +323,6 @@ public class SocketListener
                 msg_resp = Array.Empty<byte>();
                 msg_resp_texto = Array.Empty<byte>();
                 msg_resp_binario = Array.Empty<byte>();
-
 
                 strDataHora = DateTime.Now.ToString("dddd", CultureInfo.CreateSpecificCulture("en-US")).Substring(0, 3) +
                               DateTime.Now.ToString(", dd MMM yyyy mm:HH:ss", CultureInfo.CreateSpecificCulture("en-US")) + " GMT";
@@ -355,7 +343,6 @@ public class SocketListener
 
                 TipoReq = ObterTipoReq(data_v[0]);
 
-
                 if (TipoReq == eTipoReqHTTP.DESCONHECIDO)
                 {
                     SttusHTTP = eStatusHTTP.Method_Not_Allowed;
@@ -372,8 +359,6 @@ public class SocketListener
 
                 Cabecalhos = ProcessaCabecalhos(dado_recebido);
 
-
-
                 //1 - verifica se eh GET
                 if (TipoReq == eTipoReqHTTP.GET || TipoReq == eTipoReqHTTP.POST)
                 {
@@ -383,15 +368,12 @@ public class SocketListener
                     strContent = ObterMime(oFileInfo.Extension);
                     tipoArquivo = ObterTipoArquivo(strContent);
 
+                    //Se for o AJAX do teste
                     if (oFileInfo.Name == "TratarRegistro.json")
                     {
                         SttusHTTP = eStatusHTTP.OK;
                         strContent = ObterMime(oFileInfo.Extension);
-                        //conteudo_arquivo_texto = "[{'name':'Nicolas1','age':41},{'name':'Nicolas2','age':42},{'name':'Nicolas3','age':43},{'name':'Nicolas4','age':44}]";
-                        //conteudo_arquivo_texto = "{\"success\":\"true\"}";
                         conteudo_arquivo_texto = "[{\"name\":\"Nicolas1\",\"age\":41},{\"name\":\"Nicolas2\",\"age\":42},{\"name\":\"Nicolas3\",\"age\":43},{\"name\":\"Nicolas4\",\"age\":44}]";
-
-
                         goto ENVIO_RESPOSTA;
                     }
 
@@ -426,9 +408,6 @@ public class SocketListener
                         conteudo_arquivo_texto = "???";
                     }
 
-                    //byte[] binaryImage = File.ReadAllBytes(arquivo_solicitado);
-                    //conteudo_arquivo_solicitado = conteudo_arquivo_solicitado.ToString();
-
                 }
                 else
                 {
@@ -437,26 +416,12 @@ public class SocketListener
                     goto ENVIO_RESPOSTA;
                 }
 
-            //2 - le arquivo
-
-            //3 monta classe retorno com conteudo do arquivo
-
-            //4 retorna 
-            //headers["GET"]
-            //WebHeaderCollection headers = new WebHeaderCollection(). .Parse(data);
 
             ENVIO_RESPOSTA:
 
                 if (conteudo_arquivo_texto.Length > 0)
                 {
-                    //if (tipoArquivo == eTipoArquivo.TEXTO)
-                    //{
-                    //    tam_conteudo = conteudo_arquivo_texto.Length + 2;
-                    //}
-                    //else
-                    //{
                     tam_conteudo = conteudo_arquivo_texto.Length;
-                    //}
                 }
                 else if (msg_resp_binario.Length > 0)
                 {
@@ -470,7 +435,9 @@ public class SocketListener
                                $"Content-type: {strContent}\n" +
                                $"Cache-Control: public, max-age={CACHE_MAX_AGE}\n" +
                                $"Content-Length: {tam_conteudo}\n\n";
-                //Set-Cookie:bbscoito=gostso2
+
+                //pra setar/criar cookie no client, é so colocar Set-Cookie no header acima:
+                //Set-Cookie:biscoito=trakina
 
                 Console.WriteLine($"------------------------------------------------------------------------------------------------");
                 Console.WriteLine($"ENVIOU (CONTEÚDO OMITIDO): >>> >>>>>>>>>> >>>>>>>>>>\n[{dado_retorno}]");
@@ -501,7 +468,7 @@ public class SocketListener
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Console.WriteLine("Erro: " + e.ToString());
         }
 
     }
@@ -509,7 +476,7 @@ public class SocketListener
     private static void DesenhaLogo()
     {
 
-        int seed = 42;
+        int seed = DateTime.Now.Second;
         Random random = new Random(seed);
 
         // Gerando números aleatórios usando a instância com a semente
@@ -619,6 +586,7 @@ public class SocketListener
         if (_strContent.ToUpper().Trim().Contains("APPLICATION/")) return eTipoArquivo.APLICACAO;
 
         return eTipoArquivo.DESCONHECIDO;
+
     }
 
     static Dictionary<string, string> ProcessaCabecalhos(string headerString)
@@ -668,23 +636,9 @@ public class SocketListener
         }
         catch (Exception ex)
         {
-            LogaErro("Erro em " + NomeMetodo("Util") + ": " + ex.Message);
+            Console.WriteLine("Erro: " + ex.Message);
             return "";
         }
     }
-
-    private static void LogaErro(string mensagem)
-    {
-        // Implemente a lógica para registrar o erro, por exemplo, usando log ou impressão no console
-        Console.WriteLine(mensagem);
-    }
-
-    private static string NomeMetodo(string classe)
-    {
-        // Implemente a lógica para obter o nome do método, por exemplo, usando reflexão
-        return "NomeDoMetodo"; // Substitua pelo nome correto do método
-    }
-
-
 
 }
