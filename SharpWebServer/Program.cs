@@ -481,6 +481,7 @@ public class SocketListener
 
         // Gerando números aleatórios usando a instância com a semente
         int numeroAleatorio1 = random.Next(1, 5);
+        Console.Title = $"SharpWebServer {VERSAO}";
 
         //numeroAleatorio1 = 99; teste
 
@@ -539,7 +540,6 @@ public class SocketListener
         Console.WriteLine($"===================");
         Console.WriteLine($"SharpWebServer {VERSAO}");
         Console.WriteLine($"===================");
-
 
     }
 
