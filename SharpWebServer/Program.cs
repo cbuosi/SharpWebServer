@@ -13,9 +13,12 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Web;
 using System.Diagnostics;
 
+
 public class SocketListener
 {
-    const string VERSAO = "2.04";
+
+
+    const string VERSAO = "2.05";
 
     enum eTipoReqHTTP
     {
@@ -216,13 +219,14 @@ public class SocketListener
     public static void StartServer()
     {
 
-        Encoding encoder = Encoding.UTF8;
+        Encoding encoder = Encoding.Default;
 
         eTipoReqHTTP TipoReq = eTipoReqHTTP.DESCONHECIDO;
         eStatusHTTP SttusHTTP = eStatusHTTP.DESCONHECIDO;
         eTipoArquivo tipoArquivo = eTipoArquivo.DESCONHECIDO;
 
-        IPAddress ipAddress;
+        //IPAddress ipAddress;
+        Socket listener;
         IPEndPoint localEndPoint;
 
         int PortaServico = 8181;
@@ -267,26 +271,40 @@ public class SocketListener
             IPHostEntry host = Dns.GetHostEntry("localhost");
             Console.Write(" [" + host.AddressList.Count().ToString() + "]");
 
-            ipAddress = host.AddressList[0];
-
-            foreach (IPAddress address in host.AddressList)
-            {
-                Console.Write(" - IP: [" + address.ToString() + "]"); ;
-                if (address.ToString().Contains("127."))
-                {
-                    ipAddress = address;
-                }
-            }
+            //ipAddress = host.AddressList[0];
+            //
+            //foreach (IPAddress address in host.AddressList)
+            //{
+            //    Console.Write(" - IP: [" + address.ToString() + "]"); ;
+            //
+            //    //::1
+            //    if (address.ToString().Contains("::1"))
+            //    {
+            //        ipAddress = address;
+            //        break;
+            //    }
+            //
+            //    if (address.ToString().Contains("127."))
+            //    {
+            //        ipAddress = address;
+            //        break;
+            //    }
+            //}
 
             Console.WriteLine(""); ;
 
             Console.WriteLine($"Utilizando IP..............: [Any]");
             Console.WriteLine($"Utilizando Porta...........: [{PortaServico}] ");
-            localEndPoint = new IPEndPoint(IPAddress.Any, PortaServico);
 
             // Create a Socket that will use Tcp protocol
             Console.Write($"Criando 'Listener'.........: ");
-            Socket listener = new Socket(IPAddress.Any.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            listener = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+            listener.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
+            localEndPoint = new IPEndPoint(IPAddress.IPv6Any, PortaServico);
+
+            //localEndPoint = new IPEndPoint(IPAddress.Any, PortaServico);
+
             Console.WriteLine($"[OK]");
 
             // A Socket must be associated with an endpoint using the Bind method
@@ -299,7 +317,7 @@ public class SocketListener
             listener.Listen(MaxConSimultaneas);
             Console.WriteLine($"[OK] - {MaxConSimultaneas.ToString()} conexoes simultaneas.");
 
-            Console.WriteLine($"Navegue para...............: [http://{ipAddress.ToString()}:{PortaServico}/{ARQUIVO_PADRAO}]");
+            //Console.WriteLine($"Navegue para...............: [http://{ipAddress.ToString()}:{PortaServico}/{ARQUIVO_PADRAO}]");
 
 
             while (true)
@@ -333,7 +351,7 @@ public class SocketListener
                 tam_conteudo = 0;
 
                 Console.WriteLine($"----------------------------------------------------");
-                Console.WriteLine($"RECEBEU:");
+                Console.WriteLine($"RECEBEU: ");
                 Console.WriteLine($"[{dado_recebido}]");
 
                 dado_recebido = dado_recebido.Replace("\r", ""); //Retira os \r (\n = CR (Carriage Return) // Used as a new line character in Unix)
@@ -444,7 +462,8 @@ public class SocketListener
                 //Set-Cookie:biscoito=trakina
 
                 Console.WriteLine($"----------------------------------------------------");
-                Console.WriteLine($"ENVIOU (CONTEÚDO OMITIDO): >>>\n[{dado_retorno.Replace("\n\n","")}]");
+                Console.WriteLine($"ENVIOU: ");
+                Console.WriteLine($"{dado_retorno.Replace("\n\n","")}]");
 
                 msg_resp = encoder.GetBytes(dado_retorno);
 
