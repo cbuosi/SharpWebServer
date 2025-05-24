@@ -2,7 +2,7 @@
 
 ## Servidor http feito em C# 👀
 
-![SharpWebServer](https://academia.peat.com.br/SharpWebServer_01.png)
+![SharpWebServer](https://raw.githubusercontent.com/cbuosi/SharpWebServer/refs/heads/main/SharpWebServer/SharpWebServer_01.png)
 
 Utiliza os conceitos abaixo (entre outros): 
 
