@@ -240,7 +240,7 @@ public class SocketListener
         string[] data_v = { string.Empty };
         string dado_retorno = string.Empty;
         FileInfo oFileInfo;
-        //---------------------------------------------------------
+        //---
         byte[] msg_resp = { };
         byte[] msg_resp_texto = { };
         byte[] msg_resp_binario = { };
@@ -299,38 +299,42 @@ public class SocketListener
             listener.Listen(MaxConSimultaneas);
             Console.WriteLine($"[OK] - {MaxConSimultaneas.ToString()} conexoes simultaneas.");
 
-            Console.WriteLine($"Navegue para...............: [http://{ipAddress.ToString()}/{ARQUIVO_PADRAO}]");
+            Console.WriteLine($"Navegue para...............: [http://{ipAddress.ToString()}:{PortaServico}/{ARQUIVO_PADRAO}]");
 
 
             while (true)
             {
+                // -------------- -------------- -------------- -------------- -------------- -------------- -------------- -------------- 
                 ReqN += 1;
-                Console.WriteLine($"- {ReqN.ToString()} -- Aguardando conexão #########################################################################");
+                Console.WriteLine($"####################################################");
+                Console.WriteLine($"- Req N. {ReqN.ToString("#000000")} -- Aguardando requisição...");
                 Socket handler = listener.Accept();
                 oReloginho = new Stopwatch();
                 oReloginho.Start();
                 
                 dado_recebido = string.Empty;
                 dado_retorno = string.Empty;
-                bytes = new byte[1024];
+                bytes = new byte[1024 * 1024];
                 bytesRec = handler.Receive(bytes);
                 dado_recebido = encoder.GetString(bytes, 0, bytesRec);
 
                 arquivo_solicitado = "";
                 conteudo_arquivo_texto = "";
-
+                // 
                 data_v = Array.Empty<string>();
                 msg_resp = Array.Empty<byte>();
                 msg_resp_texto = Array.Empty<byte>();
                 msg_resp_binario = Array.Empty<byte>();
-
+                //
                 strDataHora = DateTime.Now.ToString("dddd", CultureInfo.CreateSpecificCulture("en-US")).Substring(0, 3) +
                               DateTime.Now.ToString(", dd MMM yyyy mm:HH:ss", CultureInfo.CreateSpecificCulture("en-US")) + " GMT";
-
+                //
                 strContent = "text/plain";
                 tam_conteudo = 0;
 
-                Console.WriteLine($"RECEBEU: <<<<<<<<<< <<<<<<<<<< <<<<<<<<<< <<<<<<<<<<\n[{dado_recebido}]");
+                Console.WriteLine($"----------------------------------------------------");
+                Console.WriteLine($"RECEBEU:");
+                Console.WriteLine($"[{dado_recebido}]");
 
                 dado_recebido = dado_recebido.Replace("\r", ""); //Retira os \r (\n = CR (Carriage Return) // Used as a new line character in Unix)
                 data_v = dado_recebido.Split("\n");
@@ -384,9 +388,9 @@ public class SocketListener
                     }
 
 
-                    //-------------------------------------------
+                    //---
                     SttusHTTP = eStatusHTTP.OK;
-                    //-------------------------------------------
+                    //---
                     if (tipoArquivo == eTipoArquivo.TEXTO)
                     {
                         conteudo_arquivo_texto = File.ReadAllText(arquivo_solicitado, Encoding.Default);
@@ -439,8 +443,8 @@ public class SocketListener
                 //pra setar/criar cookie no client, é so colocar Set-Cookie no header acima:
                 //Set-Cookie:biscoito=trakina
 
-                Console.WriteLine($"------------------------------------------------------------------------------------------------");
-                Console.WriteLine($"ENVIOU (CONTEÚDO OMITIDO): >>> >>>>>>>>>> >>>>>>>>>>\n[{dado_retorno}]");
+                Console.WriteLine($"----------------------------------------------------");
+                Console.WriteLine($"ENVIOU (CONTEÚDO OMITIDO): >>>\n[{dado_retorno.Replace("\n\n","")}]");
 
                 msg_resp = encoder.GetBytes(dado_retorno);
 
@@ -459,7 +463,7 @@ public class SocketListener
                 handler.Shutdown(SocketShutdown.Both);
                 handler.Close();
 
-                Console.WriteLine($"################################################################################################### Tempo de resposta: [{(decimal.Parse(oReloginho.ElapsedMilliseconds.ToString()) / 1000).ToString("0.####")}] segundos");
+                Console.WriteLine($"### Tempo de resposta: [{(decimal.Parse(oReloginho.ElapsedMilliseconds.ToString()) / 1000).ToString("0.####")}] segundos");
 
                 oReloginho.Stop();
 
