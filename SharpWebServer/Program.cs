@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Xml;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq.Expressions;
-using static System.Net.Mime.MediaTypeNames;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Web;
-using System.Diagnostics;
+using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
 
 
 public class SocketListener
@@ -256,7 +256,18 @@ public class SocketListener
 
             DesenhaLogo();
 
-            ROOT_SERVIDOR = ObterConfig("ROOT_SERVIDOR");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                ROOT_SERVIDOR = ObterConfig("ROOT_SERVIDOR_WIN");
+                //root = @"c:\temp\srv01";
+            }
+            else
+            {
+                ROOT_SERVIDOR = ObterConfig("ROOT_SERVIDOR_LINUX");
+                //root = "/home/cbuosi/srv01";
+            }
+
             DESCRICAO_SERVIDOR = ObterConfig("DESCRICAO_SERVIDOR") + " (" + VERSAO + ")";
             ARQUIVO_PADRAO = ObterConfig("ARQUIVO_PADRAO");
             CACHE_MAX_AGE = ObterConfig("CACHE_MAX_AGE");
@@ -329,7 +340,7 @@ public class SocketListener
                 Socket handler = listener.Accept();
                 oReloginho = new Stopwatch();
                 oReloginho.Start();
-                
+
                 dado_recebido = string.Empty;
                 dado_retorno = string.Empty;
                 bytes = new byte[1024 * 1024];
@@ -463,7 +474,7 @@ public class SocketListener
 
                 Console.WriteLine($"----------------------------------------------------");
                 Console.WriteLine($"ENVIOU: ");
-                Console.WriteLine($"{dado_retorno.Replace("\n\n","")}]");
+                Console.WriteLine($"{dado_retorno.Replace("\n\n", "")}]");
 
                 msg_resp = encoder.GetBytes(dado_retorno);
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <CONFIG>
-	<ROOT_SERVIDORx valor="/home/cbuosi/srv01/" />
-	<ROOT_SERVIDOR valor="c:/temp/srv01" />
+	<ROOT_SERVIDOR_LINUX valor="/home/cbuosi/srv01/" />
+	<ROOT_SERVIDOR_WIN valor="c:/temp/srv01" />
 	<DESCRICAO_SERVIDOR valor="BBS http server" />
 	<ARQUIVO_PADRAO valor="index.html"  />
 	<CACHE_MAX_AGE valor="60" />
