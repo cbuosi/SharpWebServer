@@ -1,0 +1,26 @@
+name: Build .NET
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Baixar código
+      uses: actions/checkout@v4
+
+    - name: Instalar .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restaurar dependências
+      run: dotnet restore
+
+    - name: Compilar projeto
+      run: dotnet build --configuration Release --no-restore
